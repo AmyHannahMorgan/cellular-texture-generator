@@ -29,3 +29,10 @@ for(let x = 0; x < canvas.height; x++) {
         ar.push(new Point(x, y, 0));
     }
 }
+
+function RNG(min, max) {
+    max = Math.ceil(max);
+    min = Math.floor(min);
+
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
