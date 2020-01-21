@@ -20,3 +20,12 @@ class Point {
 
 const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
+
+const points = [];
+
+for(let x = 0; x < canvas.height; x++) {
+    let ar = [];
+    for(let y = 0; y < canvas.height; y++) {
+        ar.push(new Point(x, y, 0));
+    }
+}
