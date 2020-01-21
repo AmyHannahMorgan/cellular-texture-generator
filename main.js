@@ -30,6 +30,20 @@ for(let x = 0; x < canvas.height; x++) {
     }
 }
 
+function checkVisitedPercentage(ar) {
+    let total = ar.length * ar[0].length;
+    let acc = 0;
+    ar.map((y) => {
+        y.map((point) => {
+            if(point.visited) {
+                acc++;
+            }
+        });
+    });
+
+    if(acc / total >= 0.9) return true;
+    else return false;
+}
 function RNG(min, max) {
     max = Math.ceil(max);
     min = Math.floor(min);
