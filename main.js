@@ -39,7 +39,7 @@ let step = 0;
 
 while(!checkVisitedPercentage(points)) {
     if(step === stepDelay) {
-        
+        poissons.push(findSafePoint(poissons, points));
     }
     else if(poissons.length === 0) {
         poissons.push(new Psudopoisson(RNG(0, canvas.width), RNG(0, canvas.height), 0, startingRadius, radiusStep));
@@ -60,6 +60,22 @@ function checkVisitedPercentage(ar) {
     if(acc / total >= 0.9) return true;
     else return false;
 }
+
+function findSafePoint(discs, points) {
+    let contender = points[RNG(0, points.length - 1)][RNG(0, points[0].length - 1)];
+    let flag = true;
+
+    discs.map((disc) => {
+        let distance = Math.abs(Math.sqrt((disc.x - contender.x)**2 + (disc.y - contender.y)**2));
+        if(distance <= disc.radius + radiusStep + startingRadius) {
+            flag = false;
+        }
+    });
+
+    if(flag) return contender;
+    else return findSafePoint(discs, points);
+}
+
 function RNG(min, max) {
     max = Math.ceil(max);
     min = Math.floor(min);
