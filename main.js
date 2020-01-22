@@ -3,8 +3,71 @@ class Psudopoisson {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.active = true;
+        this.updated = false;
         this.radius = radius
         this.step = step;
+    }
+
+    update(peers) {
+        this.updated = true;
+        let flag = true
+        let distanceToSide = this.x < canvas.width / 2 ? this.x : canvas.width - this.x;
+        let distanceToEnds = this.y < canvas.height / 2 ? this.y : canvas.height - this.y;
+
+        if(this.radius + this.step >= distanceToEnds || this.radius + this.step >= distanceToSide) flag = false;
+
+        let collisions = []
+        let closestCollion = null;
+
+        peers.map((peer) => {
+            let distance = Math.sqrt((this.x - peer.x)**2 + (this.y - peer.y)**2);
+
+            if(distance - this.radius - peer.radius - this.step - peer.step <= 0) {
+                flag = false;
+
+                collisions.push(peer);
+
+                if(closestCollion !== null) {
+                    let ccDistance = Math.sqrt((this.x - closestCollion.x)**2 + (this.y - closestCollion.y)**2);
+                    if(distance < ccDistance) closestCollion = peer;
+                }
+                else closestCollion = peer;
+            }
+        });
+
+        if(flag) {
+            this.nextRadius = this.radius + this.step;
+        }
+        else {
+            this.active = false;
+            let ccDistance = Math.sqrt((this.x - closestCollion.x)**2 + (this.y - closestCollion.y)**2);
+
+            if(ccDistance < distanceToSide && ccDistance < distanceToEnds) {
+                let overlap = ccDistance - this.radius - closestCollion.radius - this.step - closestCollion.step;
+
+                if(overlap !== 0) {
+                    closestCollion.active = false;
+
+                    this.nextRadius = this.radius + Math.ceil(overlap / 2);
+                    closestCollion.nextRadius = closestCollion.radius + Math.floor(overlap / 2);
+                }
+            }
+            else {
+                if(distanceToEnds <= distanceToSide) {
+                    this.nextRadius = this.radius + distanceToEnds;
+                }
+                else if(distanceToSide < distanceToEnds) {
+                    this.nextRadius = this.radius + distanceToEnds;
+                }
+            }
+        }
+    }
+
+    apply() {
+        this.radius = this.nextRadius;
+        this.nextRadius = 0;
+        this.updated = false;
     }
 }
 
@@ -38,6 +101,20 @@ for(let x = 0; x < canvas.width; x++) {
 let step = 0;
 
 while(!checkVisitedPercentage(points)) {
+    poissons.map((disc) => {
+        if(!disc.updated && disc.active) {
+            disc.update(poissons);
+        }
+    });
+
+    poissons.map((disc) => {
+        if(disc.updated) {
+            disc.apply();
+        }
+    })
+
+    step++
+
     if(step === stepDelay) {
         poissons.push(findSafePoint(poissons, points));
     }
