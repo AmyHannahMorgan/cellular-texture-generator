@@ -156,14 +156,15 @@ else {
             }
         })
     
-        step++
-    
-        if(step === stepDelay) {
+        if(step === stepDelay && !checkCoveredArea(canvas, poissons, 0.75)) {
             poissons.push(findSafePoint(poissons, points));
+            step = 0;
         }
         else if(poissons.length === 0) {
             poissons.push(new Psudopoisson(RNG(0, canvas.width), RNG(0, canvas.height), 0, startingRadius, radiusStep));
         }
+
+        step++
     }
 }
 
