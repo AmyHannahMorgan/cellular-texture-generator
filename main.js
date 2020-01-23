@@ -178,6 +178,76 @@ else {
 
         step++
     }
+
+    let averageDiscSize = 0
+    let candidates = [];
+    poissons.map((poisson) => {
+        averageDiscSize += poisson.radius;
+    });
+    averageDiscSize = averageDiscSize / poissons.length;
+
+    poissons.map((poisson) => {
+        if(poisson.radius >= averageDiscSize / 2) {
+            candidates.push(poisson);
+        }
+    });
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    candidates.map((disc) => {
+        ctx.beginPath();
+        ctx.arc(disc.x, disc.y, 1, 0, 2*Math.PI);
+        ctx.arc(disc.x, disc.y, disc.radius, 0, 2*Math.PI);
+        ctx.stroke();
+    });
+
+    let largestDiscSize = 0;
+    let smallestDiscSize = 0;
+    candidates.map((poisson) => {
+        if(poisson.radius > largestDiscSize) {
+            largestDiscSize = poisson.radius;
+        }
+
+        if(smallestDiscSize === 0 || poisson.radius < smallestDiscSize) {
+            smallestDiscSize = poisson.radius;
+        }
+    });
+
+    let imageData = ctx.createImageData(canvas.width, canvas.height);
+
+    for(let i = 0; i < imageData.data.length; i += 4) {
+        let y = (i / 4) / canvas.width;
+        let x = (i / 4) % canvas.width;
+
+        let closestCandidate = null;
+        candidates.map((candidate) => {
+            let myDistance = Math.sqrt((x - candidate.x)**2 + (y - candidate.y)**2);
+            if(closestCandidate !== null) {
+                let compDistance = Math.sqrt((x - closestCandidate.x)**2 + (y - closestCandidate.y)**2);
+                if(myDistance < compDistance) closestCandidate = candidate;
+            }
+            else closestCandidate = candidate;
+        });
+
+        let candidateDistance = Math.sqrt((x - closestCandidate.x)**2 + (y - closestCandidate.y)**2);
+
+        let distancePercent;
+
+        if(candidateDistance < largestDiscSize) {
+            distancePercent = (largestDiscSize - candidateDistance) / largestDiscSize
+        }
+        else{
+            distancePercent = 0
+        }
+
+        imageData.data[i + 0] = distancePercent * 255;
+        imageData.data[i + 1] = distancePercent * 255;
+        imageData.data[i + 2] = distancePercent * 255;
+        imageData.data[i + 3] = 255;
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
 }
 
 function checkCoveredArea(canvas, poissons, threshold) {
