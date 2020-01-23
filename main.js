@@ -29,8 +29,9 @@ class Psudopoisson {
                 collisions.push(peer);
 
                 if(closestCollion !== null) {
-                    let ccDistance = Math.sqrt((this.x - closestCollion.x)**2 + (this.y - closestCollion.y)**2);
-                    if(distance < ccDistance) closestCollion = peer;
+                    let ccDistance = Math.sqrt((this.x - closestCollion.x)**2 + (this.y - closestCollion.y)**2) - closestCollion.radius;
+                    let newCollisionDistance = distance - peer.radius;
+                    if(newCollisionDistance < ccDistance) closestCollion = peer;
                 }
                 else closestCollion = peer;
             }
@@ -44,11 +45,11 @@ class Psudopoisson {
             if(closestCollion !== null) {
                 let ccDistance = Math.sqrt((this.x - closestCollion.x)**2 + (this.y - closestCollion.y)**2);
     
-                if(ccDistance < distanceToSide && ccDistance < distanceToEnds) {
+                if(ccDistance - closestCollion.radius < distanceToSide && ccDistance - closestCollion.radius < distanceToEnds) {
                     let overlap = ccDistance - this.radius - closestCollion.radius - this.step - closestCollion.step;
     
                     if(overlap !== 0) {
-                        this.nextRadius = this.radius + Math.ceil(overlap / 2);
+                        this.nextRadius = this.radius + overlap / 2;
                     }
                 }
                 else {
