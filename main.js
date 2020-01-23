@@ -47,10 +47,7 @@ class Psudopoisson {
                 let overlap = ccDistance - this.radius - closestCollion.radius - this.step - closestCollion.step;
 
                 if(overlap !== 0) {
-                    closestCollion.active = false;
-
                     this.nextRadius = this.radius + Math.ceil(overlap / 2);
-                    closestCollion.nextRadius = closestCollion.radius + Math.floor(overlap / 2);
                 }
             }
             else {
@@ -80,6 +77,8 @@ class Point {
         this.value = 0;
     }
 }
+
+const debug = true;
 
 const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
@@ -112,6 +111,16 @@ while(!checkVisitedPercentage(points)) {
             disc.apply();
         }
     })
+
+    if(debug) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        poissons.map((disc) => {
+            ctx.beginPath();
+            ctx.arc(disc.x, disc.y, 1, 0, 2*Math.PI);
+            ctx.arc(disc.x, disc.y, disc.radius, 0, 2*Math.PI);
+            ctx.stroke();
+        });
+    }
 
     step++
 
