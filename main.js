@@ -143,7 +143,7 @@ if(debug) {
     }
 }
 else {
-    while(!checkVisitedPercentage(points)) {
+    while(!checkCoveredArea(canvas, poissons, 0.75)) {
         poissons.map((disc) => {
             if(!disc.updated && disc.active) {
                 disc.update(poissons);
@@ -165,6 +165,19 @@ else {
             poissons.push(new Psudopoisson(RNG(0, canvas.width), RNG(0, canvas.height), 0, startingRadius, radiusStep));
         }
     }
+}
+
+function checkCoveredArea(canvas, poissons, threshold) {
+    let canvasArea = canvas.width * canvas.height;
+    let totalPoissonArea = 0;
+
+    poissons.map((poisson) => {
+        let poissonArea = Math.PI * poisson.radius**2;
+        totalPoissonArea += poissonArea;
+    });
+
+    if(totalPoissonArea / canvasArea >= threshold) return true;
+    else return false;
 }
 
 function checkActivePoissons(ar) {
