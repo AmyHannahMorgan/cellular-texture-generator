@@ -203,6 +203,8 @@ else {
 
     let largestDiscSize = 0;
     let smallestDiscSize = 0;
+
+    let repeats = []
     candidates.map((poisson) => {
         if(poisson.radius > largestDiscSize) {
             largestDiscSize = poisson.radius;
@@ -213,6 +215,43 @@ else {
         }
     });
 
+    candidates.map((poisson) => {
+        if(poisson.y < largestDiscSize && poisson.x < largestDiscSize) {
+            let repeatPoisson = new Psudopoisson(poisson.x + canvas.width, poisson.y + canvas.height, 0, poisson.radius, 0);
+            repeats.push(repeatPoisson);
+        }
+        else if(poisson.y < largestDiscSize && poisson.x > canvas.width - largestDiscSize) {
+            let repeatPoisson = new Psudopoisson(poisson.x - canvas.width, poisson.y + canvas.height, 0, poisson.radius, 0);
+            repeats.push(repeatPoisson);
+        }
+        else if(poisson.y > canvas.height - largestDiscSize && poisson.x < largestDiscSize) {
+            let repeatPoisson = new Psudopoisson(poisson.x + canvas.width, poisson.y - canvas.height, 0, poisson.radius, 0);
+            repeats.push(repeatPoisson);
+        }
+        else if(poisson.y > canvas.height - largestDiscSize && poisson.x > canvas.width - largestDiscSize) {
+            let repeatPoisson = new Psudopoisson(poisson.x - canvas.width, poisson.y - canvas.height, 0, poisson.radius, 0);
+            repeats.push(repeatPoisson);
+        }
+        else if(poisson.y < largestDiscSize) {
+            let repeatPoisson = new Psudopoisson(poisson.x, poisson.y + canvas.height, 0, poisson.radius, 0);
+            repeats.push(repeatPoisson);
+        }
+        else if (poisson.y > canvas.height - largestDiscSize) {
+            let repeatPoisson = new Psudopoisson(poisson.x, poisson.y - canvas.height, 0, poisson.radius, 0);
+            repeats.push(repeatPoisson);
+        }
+        else if(poisson.x < largestDiscSize) {
+            let repeatPoisson = new Psudopoisson(poisson.x + canvas.width, poisson.y, 0, poisson.radius, 0);
+            repeats.push(repeatPoisson);
+        }
+        else if(poisson.x > canvas.width - largestDiscSize) {
+            let repeatPoisson = new Psudopoisson(poisson.x - canvas.width, poisson.y, 0, poisson.radius, 0);
+            repeats.push(repeatPoisson);
+        }
+    });
+
+    candidates.push(...repeats);
+    
     let imageData = ctx.createImageData(canvas.width, canvas.height);
 
     for(let i = 0; i < imageData.data.length; i += 4) {
