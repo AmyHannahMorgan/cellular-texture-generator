@@ -89,7 +89,7 @@ class Point {
     }
 }
 
-const debug = true;
+const debug = false;
 
 const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
@@ -97,7 +97,7 @@ const ctx = canvas.getContext('2d');
 const points = [];
 const poissons = [];
 
-const stepDelay = 1;
+const stepDelay = 10;
 const startingRadius = 2;
 const radiusStep = 1
 
@@ -143,10 +143,12 @@ if(debug) {
     }
 }
 else {
-    while(!checkCoveredArea(canvas, poissons, 0.75)) {
-        poissons.map((disc) => {
+    while(!checkCoveredArea(canvas, poissons, 0.5) || checkActivePoissons(poissons)) {
+        poissons.map((disc, i) => {
+            let peers = [...poissons]
+            peers.splice(i,1);
             if(!disc.updated && disc.active) {
-                disc.update(poissons);
+                disc.update(peers);
             }
         });
     
@@ -154,10 +156,20 @@ else {
             if(disc.updated) {
                 disc.apply();
             }
-        })
+        });
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        poissons.map((disc) => {
+            ctx.beginPath();
+            ctx.arc(disc.x, disc.y, 1, 0, 2*Math.PI);
+            ctx.arc(disc.x, disc.y, disc.radius, 0, 2*Math.PI);
+            ctx.stroke();
+        });
     
-        if(step === stepDelay && !checkCoveredArea(canvas, poissons, 0.75)) {
-            poissons.push(findSafePoint(poissons, points));
+        if(step === stepDelay && !checkCoveredArea(canvas, poissons, 0.5)) {
+            let point = findSafePoint(poissons, points);
+            poissons.push(new Psudopoisson(point.x, point.y, 0, startingRadius, radiusStep));
             step = 0;
         }
         else if(poissons.length === 0) {
